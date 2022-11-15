@@ -15,8 +15,21 @@ class Categories(models.Model):
 
 class Titles(models.Model):
     """Произведения, к которым пишут отзывы.
-    Определённый фильм, книга или песенка."""
-    pass
+    (определённый фильм, книга или песенка).
+    """
+    category = models.ForeignKey(
+        Categories,
+        related_name='titles',
+        on_delete=models.CASCADE,
+    )
+    genre = models.ForeignKey(
+        Genre,
+        related_name='titles',
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(max_length=200)
+    year = models.IntegerField()
+    description = models.TextField(blank=True, null=True)
 
 
 class Rewiews(models.Model):
