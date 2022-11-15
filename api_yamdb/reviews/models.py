@@ -1,5 +1,7 @@
 from django.db import models
 
+"""+ модель юзера."""
+
 
 class Genre(models.Model):
     """Категории жанров."""
