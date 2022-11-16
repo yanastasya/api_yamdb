@@ -1,13 +1,13 @@
 from django.db import models
 import datetime as dt
 from django.db.models import Q
-from django.contrib.auth import get_user_model 
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
 class Genre(models.Model):
-    """Категории жанров."""    
+    """Категории жанров."""
     name = models.CharField(max_length=64)
     slug = models.SlugField(unique=True)
 
@@ -48,21 +48,24 @@ class Titles(models.Model):
     year = models.IntegerField(
         verbose_name="год создания произведения",
     )
-    description = models.TextField( 
+    description = models.TextField(
         verbose_name="описание произведения",
     )
 
     def __str__(self):
         return self.name
 
-    """Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего)."""
+    """Нельзя добавлять произведения, которые еще не вышли
+    (год выпуска не может быть больше текущего).
+    """
     class Meta:
-        constraints = [ 
+        constraints = [
             models.CheckConstraint(
                 check=Q(year__lte=dt.datetime.today().year),
                 name='year__lte=now_year'
             )
         ]
+
 
 class TitlesGenre(models.Model):
     """Модель для связи произведений и жанров."""
