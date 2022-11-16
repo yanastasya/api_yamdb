@@ -1,19 +1,18 @@
 from django.contrib import admin
-from .models import Titles, Genre, Categories, Rewiews, Comments
+from .models import Titles, Genre, Categories, TitlesGenre
 
 
 class TitlesAdmin(admin.ModelAdmin):
 
     list_display = (
-        'pk', 'name', 'categories', 'genre', 'year', 'description',
+        'pk', 'name', 'year', 'description',
     )
-    search_fields = ('name', 'categories', 'genre',)
-    list_filter = ('name', 'categories', 'genre',)
+    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 
 admin.site.register(Titles, TitlesAdmin)
 admin.site.register(Genre)
 admin.site.register(Categories)
-admin.site.register(Rewiews)
-admin.site.register(Comments)
+admin.site.register(TitlesGenre)

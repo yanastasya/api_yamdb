@@ -14,6 +14,9 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Жанры"    
+
 
 class Categories(models.Model):
     """Категории произведений."""
@@ -22,6 +25,9 @@ class Categories(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "Категории"    
 
 
 class Titles(models.Model):
@@ -34,15 +40,15 @@ class Titles(models.Model):
     )
     category = models.ForeignKey(
         Categories,
-        verbose_name="категория произведения",
+        verbose_name="Категория",        
         related_name='titles',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-
     )
     genre = models.ManyToManyField(
-        Genre,
+        Genre,        
+        verbose_name="Жанр",               
         through='TitlesGenre',
     )
     year = models.IntegerField(
@@ -64,7 +70,8 @@ class Titles(models.Model):
                 check=Q(year__lte=dt.datetime.today().year),
                 name='year__lte=now_year'
             )
-        ]
+        ],
+        verbose_name_plural = "Произведения"
 
 
 class TitlesGenre(models.Model):
@@ -74,13 +81,3 @@ class TitlesGenre(models.Model):
 
     def __str__(self):
         return f'{self.titles} {self.genre}'
-
-
-class Rewiews(models.Model):
-    """Отзывы к произведениям."""
-    pass
-
-
-class Comments(models.Model):
-    """Комментарии к отзывам."""
-    pass
