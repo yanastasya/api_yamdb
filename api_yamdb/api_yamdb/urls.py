@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -23,5 +23,6 @@ urlpatterns = [
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),
         name='redoc'
-    ),    
+    ),
+    path('api/', include('users.urls')), # я покадля для usera сделал urlы в приложении user, потом перенесем
 ]
