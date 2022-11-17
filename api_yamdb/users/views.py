@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework import filters
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
 #from .permissions import IsAuthorOrReadOnly
-from .serializers import UserSerializer, UserMeSerializer
+from .serializers import UserSerializer, UserMeSerializer, CustomTokenObtainPairSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,3 +25,7 @@ class UserMeViewSet(
     def get_queryset(self):
         queryset = get_object_or_404(User, username=self.request.user.username)
         return queryset
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

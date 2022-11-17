@@ -1,28 +1,17 @@
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User
 
-class ChoiceField(serializers.ChoiceField):
-
-    def to_representation(self, obj):
-        if obj == '' and self.allow_blank:
-            return obj
-        return self._choices[obj]
-
-    def to_internal_value(self, data):
-        # To support inserts with the value
-        if data == '' and self.allow_blank:
-            return ''
-
-        for key, val in self._choices.items():
-            if val == data:
-                return key
-        self.fail('invalid_choice', input=data)
-
 
 class UserSerializer(serializers.ModelSerializer):
-    role = ChoiceField(choices=User.ROLE_CHOICES)
+    role = serializers.ChoiceField(
+        choices=User.ROLE_CHOICES,
+        required=False,
+        error_messages={
+            'invalid_choice': ('Доступные роли: "user", "moderator", "admin".'),
+        },
+    )
 
     class Meta:
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role',)
@@ -32,23 +21,47 @@ class UserSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'username'}
         }
 
-    # def validate(self, data):
-    #     if self.context['request'].user == data['following']:
-    #         raise serializers.ValidationError(
-    #             'Вы не можете подписываться на самого себя.')
-    #     if Follow.objects.filter(
-    #         user=self.context['request'].user,
-    #         following=data['following']
-    #     ).exists():
-    #         raise serializers.ValidationError(
-    #             'Вы уже подписаны на этого автора.')
-    #     return data
+    def validators_username():
+        # сделать валидацию для поля username чтобы туда нельзя было поставить me
+        pass
+
 
 
 class UserMeSerializer(serializers.ModelSerializer):
-    role = ChoiceField(choices=User.ROLE_CHOICES, read_only=True)
-
+    role = serializers.ChoiceField(
+        choices=User.ROLE_CHOICES,
+        required=False,
+        read_only=True
+    )
 
     class Meta:
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role',)
         model = User
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['confirmation_code'] = serializers.CharField()
+        del self.fields['password']
+
+    def validate(self, attrs):
+        data = {}
+
+        refresh = self.get_token(self.user)
+
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+
+        return data
+
+    # @classmethod
+    # def get_token(cls, user):
+    #     token = super().get_token(user)
+
+
+    #     token['username'] = user.username
+    #     # token['confirmation_code'] = user.username
+
+
+    #     return token

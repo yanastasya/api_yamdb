@@ -5,19 +5,8 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
-    
-    # def create_user(self, username, email, role, first_name=None, last_name=None, bio=None, password=None):
-    #     user = User(
-    #         username=username,
-    #         email=email,
-    #         role=role,
-    #         first_name=first_name,
-    #         last_name=last_name,
-    #         bio=bio)
-    #     user.set_unusable_password()
-    #     user.save()
-    #     return user
-    def _create_user(self, username, email, role, **extra_fields):
+
+    def _create_user(self, username, email, **extra_fields):
         if not username:
             raise ValueError('Username обязательное поле')
         if not email:
@@ -26,7 +15,6 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
             username=username,
             email=email,
-            role=role, 
             **extra_fields
         )
         user.set_unusable_password()
@@ -35,10 +23,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # confirmation_code = models.CharField(
-    #     'код подтверждения',
-    #     max_length=200,
-    # )
 
     USER = 'user'
     MODERATOR = 'moderator'
@@ -48,7 +32,6 @@ class User(AbstractUser):
         (MODERATOR, 'moderator'),
         (ADMIN, 'admin'),
     ]
-
     username_validator = UnicodeUsernameValidator()
     objects = CustomUserManager()
 
@@ -77,8 +60,8 @@ class User(AbstractUser):
         error_messages={
             'invalid_choice': ("Такой роли не существует."),
         },
+        blank=True,
         )
-    password=None
 
     def __str__(self):
         return self.username
