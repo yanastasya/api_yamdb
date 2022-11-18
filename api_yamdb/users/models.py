@@ -6,22 +6,39 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
 
-    def _create_user(self, username, email, **extra_fields):
+    def _create_user(self, username, email, password, **extra_fields):
         if not username:
             raise ValueError('Username обязательное поле')
         if not email:
             raise ValueError('Email обязательное поле')
         email = self.normalize_email(email)
+        username = self.model.normalize_username(username)
         user = self.model(
             username=username,
             email=email,
             **extra_fields
         )
-        user.set_unusable_password()
+        if extra_fields.get('is_superuser') is True:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save()
+
         return user
 
+    def create_superuser(self, username, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'admin')
 
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(username, email, password, **extra_fields)
+
+ 
 class User(AbstractUser):
 
     USER = 'user'
@@ -41,13 +58,13 @@ class User(AbstractUser):
         help_text='Буквы, цифры and @/./+/-/_ only.',
         validators=[username_validator],
         error_messages={
-            'unique': ("Username уже занят."),
+            'unique': ("Username занят."),
         },
     )
     email = models.EmailField(
         max_length=254,
         unique=True,
-        error_messages={'unique': ("Эта почта уже существует."),},
+        error_messages={'unique': ("почта уже существует."),},
     )
     first_name = models.CharField('Имя', max_length=150, blank=True)
     last_name = models.CharField('Фамилия', max_length=150, blank=True)
@@ -59,7 +76,7 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default=USER,
         error_messages={
-            'invalid_choice': ("Такой роли не существует."),
+            'invalid_choice': ("роли не существует."),
         },
         blank=True,
         )

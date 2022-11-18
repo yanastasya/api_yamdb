@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from django.utils.crypto import get_random_string
-from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
 from .models import User
 
@@ -53,7 +52,7 @@ class SignupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("запрещенное имя пользователя")
         return value
 
-        
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,21 +61,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         data = {}
+        user = get_object_or_404(User, username=attrs['username'])
+        if user.confirmation_code != attrs['confirmation_code']:
+            raise serializers.ValidationError("не верный код подверждения.")
+        refresh = self.get_token(user)
 
-        refresh = self.get_token(self.user)
-
-        data["refresh"] = str(refresh)
         data["access"] = str(refresh.access_token)
 
         return data
 
-    # @classmethod
-    # def get_token(cls, user):
-    #     token = super().get_token(user)
-
-
-    #     token['username'] = user.username
-    #     # token['confirmation_code'] = user.username
-
-
-    #     return token
