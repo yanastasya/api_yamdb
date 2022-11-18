@@ -52,6 +52,7 @@ class User(AbstractUser):
     first_name = models.CharField('Имя', max_length=150, blank=True)
     last_name = models.CharField('Фамилия', max_length=150, blank=True)
     bio = models.TextField('Биография', blank=True)
+    confirmation_code = models.CharField('Код подтверждения', max_length=6, blank=True)
     role = models.CharField(
         'Роль пользователя',
         max_length=9,

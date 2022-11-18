@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+
 from .models import User
 
 
@@ -21,10 +24,10 @@ class UserSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'username'}
         }
 
-    def validators_username():
-        # сделать валидацию для поля username чтобы туда нельзя было поставить me
-        pass
-
+    def validate_username(self, value):
+        if 'me' == value:
+            raise serializers.ValidationError("запрещенное имя пользователя")
+        return value
 
 
 class UserMeSerializer(serializers.ModelSerializer):
@@ -39,6 +42,18 @@ class UserMeSerializer(serializers.ModelSerializer):
         model = User
 
 
+class SignupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('username', 'email')
+        model = User
+
+    def validate_username(self, value):
+        if 'me' == value:
+            raise serializers.ValidationError("запрещенное имя пользователя")
+        return value
+
+        
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
