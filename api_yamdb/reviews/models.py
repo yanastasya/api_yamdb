@@ -1,16 +1,25 @@
-from django.db import models
+import datetime as dt
 
-"""+ модель юзера."""
+from django.db import models
+from django.db.models import Q
 
 
 class Genre(models.Model):
     """Категории жанров."""
-    pass
+    name = models.CharField(max_length=64)
+    slug = models.SlugField(unique=True, db_index=True)
+
+    def __str__(self):
+        return self.slug
 
 
 class Categorie(models.Model):
     """Категории произведений."""
-    pass
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True, db_index=True)
+
+    def __str__(self):
+        return self.slug
 
 
 class Title(models.Model):
@@ -23,16 +32,16 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Categorie,
-        verbose_name="Категория",        
+        verbose_name="Категория",
         related_name='titles',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     genre = models.ManyToManyField(
-        Genre,        
+        Genre,
         verbose_name="Жанр",
-        related_name='titles',               
+        related_name='titles',
         through='TitleGenre',
         null=True,
         blank=True,
@@ -46,13 +55,32 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-    
 
-class Rewiew(models.Model):
-    """Отзывы к произведениям."""
-    pass
+    """Нельзя добавлять произведения, которые еще не вышли
+    (год выпуска не может быть больше текущего).
+    """
+    class Meta:
+        constraints = models.CheckConstraint(
+            check=Q(year__lte=dt.datetime.today().year),
+            name='year__lte=now_year'
+        ),
+        verbose_name_plural = "Произведения"
 
 
-class Comment(models.Model):
-    """Комментарии к отзывам."""
-    pass
+class TitleGenre(models.Model):
+    """Модель для связи произведений и жанров."""
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return f'{self.title} {self.genre}'
