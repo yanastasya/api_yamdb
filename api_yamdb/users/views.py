@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.crypto import get_random_string
