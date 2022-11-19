@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Title, Genre, Categorie, TitleGenre, Review, Comment
 
+
 class TitlesAdmin(admin.ModelAdmin):
 
     list_display = (

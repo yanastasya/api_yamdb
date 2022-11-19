@@ -4,10 +4,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q
 
-from django.contrib.auth import get_user_model
-
-
-User = get_user_model()
+from users.models import User
 
 
 class Genre(models.Model):
@@ -94,7 +91,7 @@ class TitleGenre(models.Model):
 
  
 class Review(models.Model):
-    """Модель для отзывов."""
+    """Модель для отзывов к произведениям."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -134,7 +131,7 @@ class Review(models.Model):
     
  
 class Comment(models.Model):
-    """Модель для комментариев к произведениям."""
+    """Модель для комментариев к отзывам."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
