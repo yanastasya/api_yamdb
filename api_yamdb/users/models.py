@@ -6,7 +6,7 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
 
-    def _create_user(self, username, email, password, **extra_fields):
+    def create_user(self, username, email, password, **extra_fields):
         if not username:
             raise ValueError('Username обязательное поле')
         if not email:
@@ -36,7 +36,7 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(username, email, password, **extra_fields)
+        return self.create_user(username, email, password, **extra_fields)
 
  
 class User(AbstractUser):
@@ -80,6 +80,9 @@ class User(AbstractUser):
         },
         blank=True,
         )
+        
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.username

@@ -4,12 +4,12 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAdminUser
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
+from .pagination import Pagination
 
 
 from .models import User
-from .permissions import RoleAdmin
+from .permissions import IsRoleAdminOrSuperUser
 from .serializers import UserSerializer, UserMeSerializer, CustomTokenObtainPairSerializer, SignupSerializer
 
 
@@ -17,8 +17,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    pagination_class = PageNumberPagination
-    permission_classes = [RoleAdmin, IsAdminUser, ]
+    pagination_class = Pagination
+    permission_classes = [IsRoleAdminOrSuperUser, ]
 
 
 class UserMeViewSet(
@@ -62,7 +62,7 @@ class SignupViewSet(mixins.CreateModelMixin,
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
         confirmation_code = get_random_string(length=6)
         User.objects.filter(username=username).update(confirmation_code=confirmation_code)
         send_mail(
