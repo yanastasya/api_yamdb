@@ -12,6 +12,7 @@ from .serializers import CommentSerializer, ReviewSerializer
 from users.permissions import IsRoleAdminOrSuperUser
 from users.pagination import Pagination
 from django.shortcuts import get_object_or_404
+from api.permissions import IsAdmimOrReadOnly
 
 
 class CategorieViewSet(
@@ -33,6 +34,7 @@ class CategorieViewSet(
     search_fields = ('name',)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
+    permission_classes = [IsAdmimOrReadOnly]
     
 
 
@@ -55,6 +57,7 @@ class GenreViewSet(
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
+    permission_classes = [IsAdmimOrReadOnly]
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -76,6 +79,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -87,6 +91,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = [IsAdmimOrReadOnly]
 
     def get_queryset(self):
         review = get_object_or_404(
@@ -106,6 +111,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = [IsAdmimOrReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(
