@@ -1,13 +1,14 @@
 from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework import filters
-from rest_framework.pagination import LimitOffsetPagination
+#from rest_framework.permissions import IsAuthenticatedOrReadOnly|
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import Title, Genre, Categorie
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
+from .permissions import IsAdmimOrReadOnly
 
 
 class CategorieViewSet(
@@ -27,8 +28,8 @@ class CategorieViewSet(
     serializer_class = CategorieSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
+    permission_classes = [IsAdmimOrReadOnly]
 
 
 class GenreViewSet(
@@ -46,10 +47,10 @@ class GenreViewSet(
     """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
+    permission_classes = [IsAdmimOrReadOnly]
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -68,9 +69,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     DEL: удаление произведения по id - только администратор.
     """
     queryset = Title.objects.all()
-    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug', 'genre',)
+    permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
