@@ -8,6 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from reviews.models import Title, Genre, Categorie
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
+from users.permissions import IsRoleAdminOrSuperUser
+from users.pagination import Pagination
 
 
 class CategorieViewSet(
@@ -29,6 +31,7 @@ class CategorieViewSet(
     search_fields = ('name',)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
+    #permission_classes = IsRoleAdminOrSuperUser
 
 
 class GenreViewSet(
