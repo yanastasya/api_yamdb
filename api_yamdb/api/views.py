@@ -32,7 +32,7 @@ class CategorieViewSet(
     serializer_class = CategorieSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     permission_classes = [IsAdmimOrReadOnly]
     
@@ -53,7 +53,7 @@ class GenreViewSet(
     """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -76,7 +76,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     DEL: удаление произведения по id - только администратор.
     """
     queryset = Title.objects.all()
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
     permission_classes = [IsAdmimOrReadOnly]
@@ -90,7 +90,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_queryset(self):
@@ -110,7 +110,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = LimitOffsetPagination
+    #pagination_class = LimitOffsetPagination
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_queryset(self):
