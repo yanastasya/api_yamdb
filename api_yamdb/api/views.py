@@ -5,11 +5,13 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from reviews.models import Title, Genre, Categorie
+from reviews.models import Title, Genre, Categorie, Review
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
+from .serializers import CommentSerializer, ReviewSerializer
 from users.permissions import IsRoleAdminOrSuperUser
 from users.pagination import Pagination
+from django.shortcuts import get_object_or_404
 
 
 class CategorieViewSet(
@@ -31,7 +33,7 @@ class CategorieViewSet(
     search_fields = ('name',)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
-    #permission_classes = IsRoleAdminOrSuperUser
+    
 
 
 class GenreViewSet(
@@ -81,4 +83,39 @@ class TitleViewSet(viewsets.ModelViewSet):
 
         return TitlePostSerializer
 
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id')
+        )
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id')
+        )
+        serializer.save(author=self.request.user, review=review)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
 

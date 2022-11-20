@@ -96,9 +96,9 @@ class Review(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Произведение'
+        verbose_name='Автор'
     )
-    text = models.TextField
+    text = models.TextField()
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
@@ -107,7 +107,7 @@ class Review(models.Model):
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Автор'
+        verbose_name='Произведение'
     )
     score = models.SmallIntegerField(
         validators=[
