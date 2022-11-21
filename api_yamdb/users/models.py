@@ -81,7 +81,7 @@ class User(AbstractUser):
             'invalid_choice': ("роли не существует."),
         },
         blank=True,
-        )
+    )
 
     class Meta:
         ordering = ['id']

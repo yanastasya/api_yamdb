@@ -77,7 +77,7 @@ class SignupViewSet(
         confirmation_code = get_random_string(length=6)
         User.objects.filter(
             username=username
-            ).update(confirmation_code=confirmation_code)
+        ).update(confirmation_code=confirmation_code)
         send_mail(
             'Ваш код подтверждения',
             f'"confirmation_code": "{confirmation_code}"',
