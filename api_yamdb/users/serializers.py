@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
 from django.shortcuts import get_object_or_404
 
 from .models import User
@@ -11,12 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         choices=User.ROLE_CHOICES,
         required=False,
         error_messages={
-            'invalid_choice': ('Доступные роли: "user", "moderator", "admin".'),
+            'invalid_choice': (
+                'Доступные роли: "user", "moderator", "admin".'
+            ),
         },
     )
 
     class Meta:
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role',)
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
         model = User
         lookup_field = 'username'
         extra_kwargs = {
@@ -37,9 +40,11 @@ class UserMeSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role',)
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
         model = User
-        read_only_fields = ['username', 'email',]
+        read_only_fields = ['username', 'email', ]
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -51,6 +56,7 @@ class SignupSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if 'me' == value:
             raise serializers.ValidationError("запрещенное имя пользователя")
+
         return value
 
 

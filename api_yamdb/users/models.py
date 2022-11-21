@@ -38,7 +38,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
- 
+
 class User(AbstractUser):
 
     USER = 'user'
@@ -64,12 +64,14 @@ class User(AbstractUser):
     email = models.EmailField(
         max_length=254,
         unique=True,
-        error_messages={'unique': ("почта уже существует."),},
+        error_messages={'unique': ("почта уже существует."), },
     )
     first_name = models.CharField('Имя', max_length=150, blank=True)
     last_name = models.CharField('Фамилия', max_length=150, blank=True)
     bio = models.TextField('Биография', blank=True)
-    confirmation_code = models.CharField('Код подтверждения', max_length=6, blank=True)
+    confirmation_code = models.CharField(
+        'Код подтверждения', max_length=6, blank=True
+    )
     role = models.CharField(
         'Роль пользователя',
         max_length=9,
@@ -80,7 +82,7 @@ class User(AbstractUser):
         },
         blank=True,
         )
-        
+
     class Meta:
         ordering = ['id']
 
