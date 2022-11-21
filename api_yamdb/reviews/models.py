@@ -8,7 +8,7 @@ from users.models import User
 
 
 class Genre(models.Model):
-    """Категории жанров."""
+    """Жанры произведений."""
     name = models.CharField(max_length=64)
     slug = models.SlugField(unique=True, db_index=True)
 
@@ -35,7 +35,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Categorie,
-        verbose_name="Категория",
+        verbose_name="Категория произведения",
         related_name='titles',
         on_delete=models.SET_NULL,
         null=True,
@@ -43,11 +43,9 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        verbose_name="Жанр",
+        verbose_name="Жанр произведения",
         related_name='titles',
         through='TitleGenre',
-        null=True,
-        blank=True,
     )
     year = models.IntegerField(
         verbose_name="год создания произведения",
@@ -59,9 +57,6 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
-    """Нельзя добавлять произведения, которые еще не вышли
-    (год выпуска не может быть больше текущего).
-    """
     class Meta:
         constraints = models.CheckConstraint(
             check=Q(year__lte=dt.datetime.today().year),
@@ -89,7 +84,6 @@ class TitleGenre(models.Model):
         return f'{self.title} {self.genre}'
 
 
- 
 class Review(models.Model):
     """Модель для отзывов к произведениям."""
     author = models.ForeignKey(
@@ -116,7 +110,7 @@ class Review(models.Model):
         ],
         verbose_name='Оценка'
     )
- 
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -125,11 +119,11 @@ class Review(models.Model):
         ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
- 
+
     def __str__(self):
         return self.text
-    
- 
+
+
 class Comment(models.Model):
     """Модель для комментариев к отзывам."""
     author = models.ForeignKey(
@@ -151,10 +145,10 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Отзыв',
     )
- 
+
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
- 
+
     def __str__(self):
         return self.text
