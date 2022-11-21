@@ -12,6 +12,7 @@ from .serializers import TitleGetSerializer, TitlePostSerializer
 from .serializers import CommentSerializer, ReviewSerializer
 from django.shortcuts import get_object_or_404
 from api.permissions import IsAdmimOrReadOnly, IsAdmimOrModeratorOrReadOnly
+from .filters import TitleFilter
 
 
 class CategorieViewSet(
@@ -74,7 +75,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug')
+    filter_backends = (DjangoFilterBackend,)    
+    filterset_class = TitleFilter    
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
