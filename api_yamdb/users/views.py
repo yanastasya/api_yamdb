@@ -84,6 +84,6 @@ class SignupViewSet(mixins.CreateModelMixin,
             f'"confirmation_code": "{confirmation_code}"',
             'from@example.com',
             [f'{email}'],
-             fail_silently=False,
+            fail_silently=False,
         )
         serializer.save(confirmation_code=confirmation_code)
