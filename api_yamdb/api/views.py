@@ -1,18 +1,17 @@
 from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework import filters
-from rest_framework.pagination import LimitOffsetPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.response import Response
 
 from reviews.models import Title, Genre, Categorie, Review
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
 from .serializers import CommentSerializer, ReviewSerializer
-from users.permissions import IsRoleAdminOrSuperUser
-from users.pagination import Pagination
 from django.shortcuts import get_object_or_404
-from api.permissions import IsAdmimOrReadOnly
+from api.permissions import IsAdmimOrReadOnly, IsAdmimOrModeratorOrReadOnly
 
 
 class CategorieViewSet(
@@ -32,7 +31,6 @@ class CategorieViewSet(
     serializer_class = CategorieSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    #pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     permission_classes = [IsAdmimOrReadOnly]
     
@@ -53,7 +51,6 @@ class GenreViewSet(
     """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    #pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -76,9 +73,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     DEL: удаление произведения по id - только администратор.
     """
     queryset = Title.objects.all()
-    #pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug', 'genre',)
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
@@ -90,8 +86,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    #pagination_class = LimitOffsetPagination
-    permission_classes = [IsAdmimOrReadOnly]
+    permission_classes = [IsAdmimOrModeratorOrReadOnly]
 
     def get_queryset(self):
         review = get_object_or_404(
@@ -110,14 +105,22 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    #pagination_class = LimitOffsetPagination
-    permission_classes = [IsAdmimOrReadOnly]
+    permission_classes = [IsAdmimOrModeratorOrReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(
             Title,
             id=self.kwargs.get('title_id'))
         return title.reviews.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if not Review.objects.filter(author=self.request.user, title=self.kwargs.get('title_id')).exists():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'message': 'Вы оставляли отзыв на это творение.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         title = get_object_or_404(

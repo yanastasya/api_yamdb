@@ -5,11 +5,10 @@ from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .pagination import Pagination
 
 
 from .models import User
-from .permissions import IsRoleAdminOrSuperUser
+from api.permissions import IsAdminOrSuperUser
 from .serializers import UserSerializer, UserMeSerializer, CustomTokenObtainPairSerializer, SignupSerializer
 
 
@@ -17,8 +16,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    pagination_class = Pagination
-    permission_classes = [IsRoleAdminOrSuperUser, ]
+    permission_classes = [IsAdminOrSuperUser, ]
 
 
 class UserMeViewSet(

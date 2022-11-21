@@ -35,12 +35,11 @@ class UserMeSerializer(serializers.ModelSerializer):
         required=False,
         read_only=True
     )
-    username=serializers.CharField(read_only=True)
-    email=serializers.CharField(read_only=True)
 
     class Meta:
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role',)
         model = User
+        read_only_fields = ['username', 'email',]
 
 
 class SignupSerializer(serializers.ModelSerializer):
