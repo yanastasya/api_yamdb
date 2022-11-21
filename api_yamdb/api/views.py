@@ -13,6 +13,7 @@ from users.permissions import IsRoleAdminOrSuperUser
 from users.pagination import Pagination
 from django.shortcuts import get_object_or_404
 from api.permissions import IsAdmimOrReadOnly
+from api.filters import TitleFilter
 
 
 class CategorieViewSet(
@@ -77,8 +78,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     queryset = Title.objects.all()
     #pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    #filter_backends = (DjangoFilterBackend,)
+    #filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    filterset = TitleFilter
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
