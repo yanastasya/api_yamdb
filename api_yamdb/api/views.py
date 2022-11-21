@@ -1,18 +1,17 @@
 from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework import filters
-
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 
 from reviews.models import Title, Genre, Categorie, Review
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
 from .serializers import CommentSerializer, ReviewSerializer
-from django.shortcuts import get_object_or_404
-from api.permissions import IsAdmimOrReadOnly, IsAdmimOrModeratorOrReadOnly
 from .filters import TitleFilter
+from api.permissions import IsAdmimOrReadOnly, IsAdmimOrModeratorOrReadOnly
 
 
 class CategorieViewSet(
@@ -34,7 +33,6 @@ class CategorieViewSet(
     search_fields = ('name',)
     lookup_field = 'slug'
     permission_classes = [IsAdmimOrReadOnly]
-    
 
 
 class GenreViewSet(
@@ -75,8 +73,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filter_backends = (DjangoFilterBackend,)    
-    filterset_class = TitleFilter    
+    filterset_class = TitleFilter
     permission_classes = [IsAdmimOrReadOnly]
 
     def get_serializer_class(self):
@@ -87,6 +84,17 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Эндпоинт /api/v1/titles/{title_id}/reviews/{review_id}/comments/.
+    GET запрос: Получить список всех комментариев к отзыву по id.
+    Права доступа: Доступно без токена.
+    POST запрос: Добавить новый комментарий для отзыва.
+    Права доступа: Аутентифицированные пользователи.
+    Эндпоинт /titles/{title_id}/reviews/{review_id}/comments/{comment_id}/.
+    GET запрос: Получить комментарий для отзыва по id.
+    Права доступа: Доступно без токена.
+    PATCH и DEL запросы: частичное изменение или удаление комментария по id.
+    Права доступа: Автор отзыва, модератор или администратор.
+    """
     serializer_class = CommentSerializer
     permission_classes = [IsAdmimOrModeratorOrReadOnly]
 
@@ -106,6 +114,17 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Эндпоинт /api/v1/titles/{title_id}/reviews/.
+    GET запрос: получение списка всех отзывов. Доступно без токена.
+    POST запрос: добавить новый отзыв. Пользователь может оставить
+    только один отзыв на произведение.
+    Права доступа: Аутентифицированные пользователи.
+    Эндпоинт /api/v1/titles/{title_id}/reviews/{review_id}/.
+    GET запрос: Получить отзыв по id для указанного произведения.
+    Права доступа: Доступно без токена.
+    PATCH и DEL запросы: частичное изменение или удаление отзыва по id.
+    Права доступа: Автор отзыва, модератор или администратор.
+    """
     serializer_class = ReviewSerializer
     permission_classes = [IsAdmimOrModeratorOrReadOnly]
 
@@ -118,15 +137,23 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not Review.objects.filter(author=self.request.user, title=self.kwargs.get('title_id')).exists():
+        if not Review.objects.filter(
+            author=self.request.user, title=self.kwargs.get('title_id')
+        ).exists():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response({'message': 'Вы оставляли отзыв на это творение.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        return Response(
+            {'message': 'Вы оставляли отзыв на это творение.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def perform_create(self, serializer):
         title = get_object_or_404(
             Title,
             id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
-

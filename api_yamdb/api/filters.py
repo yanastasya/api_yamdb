@@ -1,9 +1,10 @@
 import django_filters
+
 from reviews.models import Title
 
 
 class TitleFilter(django_filters.FilterSet):
-    "Фильтр для поиска произведений по жанру, категориям, названию и году выпуска."
+    """Фильтр для поиска произведений."""
     category = django_filters.CharFilter(
         field_name='category__slug'
     )
@@ -11,7 +12,7 @@ class TitleFilter(django_filters.FilterSet):
         field_name='genre__slug'
     )
     name = django_filters.CharFilter(
-        field_name='name', lookup_expr='contains'    
+        field_name='name', lookup_expr='contains'
     )
     year = django_filters.NumberFilter(
         field_name='year'
@@ -24,4 +25,4 @@ class TitleFilter(django_filters.FilterSet):
             'genre',
             'name',
             'year'
-        )    
+        )

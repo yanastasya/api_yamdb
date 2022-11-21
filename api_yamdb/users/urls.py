@@ -5,8 +5,8 @@ from .views import UserViewSet, UserMeViewSet, CustomTokenObtainPairView, Signup
 
 
 
-router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='users')
+v1_router = DefaultRouter()
+v1_router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
     path(
@@ -14,7 +14,7 @@ urlpatterns = [
         UserMeViewSet.as_view({'get': 'retrieve', 'patch': 'update'}),
         name='user_me'
     ),
-    path(r'v1/', include(router.urls)),
+    path(r'v1/', include(v1_router.urls)),
     path(r'v1/auth/signup/', SignupViewSet.as_view({'post': 'create'}), name='signup'),
     path(r'v1/auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]
