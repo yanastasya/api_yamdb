@@ -54,15 +54,15 @@ class Title(models.Model):
         verbose_name="описание произведения",
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         constraints = models.CheckConstraint(
             check=Q(year__lte=dt.datetime.today().year),
             name='year__lte=now_year'
         ),
         verbose_name_plural = "Произведения"
+
+    def __str__(self):
+        return self.name
 
 
 class TitleGenre(models.Model):

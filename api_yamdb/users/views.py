@@ -10,6 +10,7 @@ from .models import User
 from .serializers import UserSerializer, UserMeSerializer
 from .serializers import CustomTokenObtainPairSerializer, SignupSerializer
 from api.permissions import IsAdminOrSuperUser
+from api_yamdb.constants import CONFIRMATION_CODE_LENGTH
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -74,7 +75,9 @@ class SignupViewSet(
                 status=status.HTTP_200_OK,
                 headers=headers
             )
-        confirmation_code = get_random_string(length=6)
+        confirmation_code = get_random_string(
+                length=CONFIRMATION_CODE_LENGTH
+        )
         User.objects.filter(
             username=username
         ).update(confirmation_code=confirmation_code)
@@ -95,7 +98,9 @@ class SignupViewSet(
 
     def perform_create(self, serializer):
         email = serializer.validated_data['email']
-        confirmation_code = get_random_string(length=6)
+        confirmation_code = get_random_string(
+                length=CONFIRMATION_CODE_LENGTH
+        )
         send_mail(
             'Ваш код подтверждения',
             f'"confirmation_code": "{confirmation_code}"',
