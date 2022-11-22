@@ -1,6 +1,7 @@
 import datetime as dt
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 
@@ -90,10 +91,18 @@ class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Review."""
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True
+        read_only=True,
+        #default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Review
         fields = '__all__'
         read_only_fields = ['title', ]
+
+        #validators = [
+            #UniqueTogetherValidator(
+                #queryset=Review.objects.all(),
+                #fields=('author', 'title')
+            #)
+        #]

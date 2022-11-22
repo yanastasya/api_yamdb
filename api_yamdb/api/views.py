@@ -140,6 +140,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if not Review.objects.filter(
             author=self.request.user, title=self.kwargs.get('title_id')
         ).exists():
+        #if request.data.is_valid:
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(
