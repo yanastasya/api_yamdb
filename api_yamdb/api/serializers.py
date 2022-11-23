@@ -3,8 +3,6 @@ import datetime as dt
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework.validators import UniqueTogetherValidator
-from rest_framework.request import Request 
 
 from reviews.models import Title, Genre, Categorie, Review, Comment
 from users.models import User
@@ -38,7 +36,8 @@ class TitleGetSerializer(serializers.ModelSerializer):
         max_value=10,
         read_only=True,
         required=False
-        )
+    )
+
     class Meta:
         fields = (
             'id', 'name', 'category', 'genre', 'description', 'year', 'rating'
@@ -97,11 +96,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
         read_only_fields = ['title', ]
-        
+
     def validate(self, data):
         if self.context['request'].method != 'POST':
             return data
-        
+
         title_id = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
         if Review.objects.filter(

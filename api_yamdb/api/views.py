@@ -103,11 +103,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         avg = Review.objects.filter(title=instance).aggregate(Avg('score'))
-        instance.rating=avg['score__avg']
+        instance.rating = avg['score__avg']
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    
+
 class CommentViewSet(viewsets.ModelViewSet):
     """Эндпоинт /api/v1/titles/{title_id}/reviews/{review_id}/comments/.
     GET запрос: Получить список всех комментариев к отзыву по id.
@@ -229,7 +229,7 @@ class SignupViewSet(
                 headers=headers
             )
         confirmation_code = get_random_string(
-                length=settings.CONFIRMATION_CODE_LENGTH
+            length=settings.CONFIRMATION_CODE_LENGTH
         )
         User.objects.filter(
             username=username
@@ -252,7 +252,7 @@ class SignupViewSet(
     def perform_create(self, serializer):
         email = serializer.validated_data['email']
         confirmation_code = get_random_string(
-                length=settings.CONFIRMATION_CODE_LENGTH
+            length=settings.CONFIRMATION_CODE_LENGTH
         )
         send_mail(
             'Ваш код подтверждения ',

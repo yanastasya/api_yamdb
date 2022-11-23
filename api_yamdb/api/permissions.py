@@ -15,7 +15,7 @@ class IsAdmimOrReadOnly(BasePermission):
     """У всех, кроме админа и суперюзера, права только на чтение."""
     def has_permission(self, request, view):
         return (
-            request.method in SAFE_METHODS 
+            request.method in SAFE_METHODS
             or not request.user.is_anonymous
             and (request.user.is_admin_or_super_user)
         )
@@ -29,7 +29,6 @@ class IsAdmimOrReadOnly(BasePermission):
 
 
 class IsAdmimOrModeratorOrReadOnly(BasePermission):
-    """У всех, кроме админа, суперюзера и модератора, права только на чтение."""
 
     def has_permission(self, request, view):
         return (
