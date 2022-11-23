@@ -1,52 +1,39 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-"""Не очень хорошо, что у нас так жестко все прописано.(напр. request.user.role == 'admin')
-        Стоит посмотреть на то, чтобы роль сделать атрибутом модели пользователя.
-        Также настоятельно рекомендую присмотреться к @property, чтобы легко получать
-        нужные данные: https://stackoverflow.com/questions/58558989/what-does-djangos-property-do
-        """ 
-
-"""Также попробуй оставить только три пермишена: админский, админ-модератор, админ-модератор-автор."""
 
 class IsAdminOrSuperUser(BasePermission):
-    """Доступ админу и суперюзеру."""
+    """Доступ админу и суперюзеру, для эндпоинта 'users'."""
 
     def has_permission(self, request, view):
         return (
-                not request.user.is_anonymous
-                and (request.user.role == 'admin' or request.user.is_superuser)
+            not request.user.is_anonymous
+            and request.user.is_admin_or_super_user
         )
 
 
-class IsAuthor(BasePermission):
-    """Запрет на редактирование чужого контента."""
-    def has_object_permission(self, request, view, obj):
-        return obj.author == request.user
-
-
 class IsAdmimOrReadOnly(BasePermission):
-    """У всех, кроме админа, права только на чтение."""
+    """У всех, кроме админа и суперюзера, права только на чтение."""
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS 
             or not request.user.is_anonymous
-            and (request.user.role == 'admin' or request.user.is_superuser)
+            and (request.user.is_admin_or_super_user)
         )
 
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
             or not request.user.is_anonymous
-            and (request.user.role == 'admin' or request.user.is_superuser)
+            and (request.user.is_admin_or_super_user)
         )
 
 
 class IsAdmimOrModeratorOrReadOnly(BasePermission):
-    """У всех, кроме админа и модератора, права только на чтение."""
+    """У всех, кроме админа, суперюзера и модератора, права только на чтение."""
 
     def has_permission(self, request, view):
         return (
-            request.user.is_anonymous is False
+            not request.user.is_anonymous
             or request.method in SAFE_METHODS
         )
 
@@ -54,10 +41,6 @@ class IsAdmimOrModeratorOrReadOnly(BasePermission):
         return (
             request.method in SAFE_METHODS
             or not request.user.is_anonymous
-            and (
-                request.user.role == 'admin'
-                or request.user.is_superuser
-                or request.user.role == 'moderator'
-            )
+            and request.user.is_moderator_or_admin_or_super_user
             or obj.author == request.user
         )

@@ -88,3 +88,17 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_admin_or_super_user(self):
+        if self.role == self.ADMIN or self.is_superuser:
+            return True
+        return False
+
+    @property
+    def is_moderator_or_admin_or_super_user(self):
+        # не уверен что так правильно, но мне показалось логичным,
+        # если уж модератору "можно", то пусть сразу и админам.
+        if self.role == self.MODERATOR or self.is_admin_or_super_user: 
+            return True
+        return False

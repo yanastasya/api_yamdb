@@ -3,15 +3,33 @@ from rest_framework import mixins
 from rest_framework import filters
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.db.models import Avg
 
 from reviews.models import Title, Genre, Categorie, Review
+from users.models import User
 from .serializers import GenreSerializer, CategorieSerializer
 from .serializers import TitleGetSerializer, TitlePostSerializer
-from .serializers import CommentSerializer, ReviewSerializer
+from .serializers import (
+    CommentSerializer,
+    ReviewSerializer,
+    UserSerializer,
+    UserMeSerializer,
+    CustomTokenObtainPairSerializer,
+    SignupSerializer
+)
 from .filters import TitleFilter
-from api.permissions import IsAdmimOrReadOnly, IsAdmimOrModeratorOrReadOnly
+from .permissions import (
+    IsAdmimOrReadOnly,
+    IsAdmimOrModeratorOrReadOnly,
+    IsAdminOrSuperUser
+)
 
 
 class CategorieViewSet(
@@ -82,7 +100,14 @@ class TitleViewSet(viewsets.ModelViewSet):
 
         return TitlePostSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        avg = Review.objects.filter(title=instance).aggregate(Avg('score'))
+        instance.rating=avg['score__avg']
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
+    
 class CommentViewSet(viewsets.ModelViewSet):
     """Эндпоинт /api/v1/titles/{title_id}/reviews/{review_id}/comments/.
     GET запрос: Получить список всех комментариев к отзыву по id.
@@ -134,27 +159,106 @@ class ReviewViewSet(viewsets.ModelViewSet):
             id=self.kwargs.get('title_id'))
         return title.reviews.all()
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if not Review.objects.filter(
-            author=self.request.user, title=self.kwargs.get('title_id')
-        ).exists():
-        #if request.data.is_valid:
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
-        return Response(
-            {'message': 'Вы оставляли отзыв на это творение.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
     def perform_create(self, serializer):
         title = get_object_or_404(
             Title,
             id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    permission_classes = [IsAdminOrSuperUser, ]
+
+
+class UserMeViewSet(
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        viewsets.GenericViewSet
+):
+    queryset = User.objects.all()
+    serializer_class = UserMeSerializer
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.get(username=self.request.user.username)
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny, ]
+
+
+class SignupViewSet(
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = User.objects.all()
+    serializer_class = SignupSerializer
+    permission_classes = [AllowAny, ]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            email = serializer.initial_data['email']
+            username = serializer.initial_data['username']
+        except KeyError:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+
+        if not User.objects.filter(username=username, email=email).exists():
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK,
+                headers=headers
+            )
+        confirmation_code = get_random_string(
+                length=settings.CONFIRMATION_CODE_LENGTH
+        )
+        User.objects.filter(
+            username=username
+        ).update(confirmation_code=confirmation_code)
+        send_mail(
+            'Ваш код подтверждения ',
+            f'"confirmation_code": "{confirmation_code}" ',
+            settings.EMAIL_SENDER,
+            [f'{email}'],
+            fail_silently=False,
+        )
+        headers = self.get_success_headers(serializer.initial_data)
+
+        return Response(
+            serializer.initial_data,
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
+
+    def perform_create(self, serializer):
+        email = serializer.validated_data['email']
+        confirmation_code = get_random_string(
+                length=settings.CONFIRMATION_CODE_LENGTH
+        )
+        send_mail(
+            'Ваш код подтверждения ',
+            f'"confirmation_code": "{confirmation_code}" ',
+            settings.EMAIL_SENDER,
+            [f'{email}'],
+            fail_silently=False,
+        )
+        serializer.save(confirmation_code=confirmation_code)

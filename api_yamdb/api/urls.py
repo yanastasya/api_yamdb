@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 
 from .views import GenreViewSet, CategorieViewSet
 from .views import TitleViewSet, ReviewViewSet, CommentViewSet
-from users.views import UserViewSet, UserMeViewSet
-from users.views import CustomTokenObtainPairView, SignupViewSet
+from api.views import UserViewSet, UserMeViewSet
+from api.views import CustomTokenObtainPairView, SignupViewSet
 
 app_name = 'api'
 
