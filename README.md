@@ -87,13 +87,13 @@ Python, Django, Django Rest Framework, PyJWT, django-filter.
 ``` python manage.py migrate ```
 
 - Далее можно загрузить данные из .csv таблиц командами:
-``` python manage.py load_category_data ```
-``` python manage.py load_genre_data ```
-``` python manage.py load_users_data ```
-``` python manage.py load_title_data ```
-``` python manage.py load_genre_title_data ```
-``` python manage.py load_rewiews_data ```
-``` python manage.py load_comments_data ```
+- ``` python manage.py load_category_data ```
+- ``` python manage.py load_genre_data ```
+- ``` python manage.py load_users_data ```
+- ``` python manage.py load_title_data ```
+- ``` python manage.py load_genre_title_data ```
+- ``` python manage.py load_rewiews_data ```
+- ``` python manage.py load_comments_data ```
 
 Запустить локальный сервер:
 ``` python manage.py runserver ```
