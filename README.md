@@ -17,7 +17,6 @@ API позволяет создавать и регистрировать пол
 
 Полную документацию API можно посмотреть после запуска сервера по адресу http://127.0.0.1/redoc.
 
-
 # Возможности API
 ## Пользователи/User:
 
@@ -74,31 +73,6 @@ API позволяет создавать и регистрировать пол
 # Технологии
 Python, Django, Django Rest Framework, PyJWT, django-filter.
 
-# Как запустить
-На локальном компьютере должен быть установлен Python версии 3 или выше.
-
-- Склонировать данный репозиторий на свой локальный компьютер.
-- Установить виртуальное окружение:
-``` python3 -3.7 -m venv venv ```
-- Обновить менеджер pip и установить зависимости:
-``` py -m pip install --upgrade pip ```
-``` pip install -r requirements.txt. ```
-- Выполнить миграции:
-``` python manage.py migrate ```
-
-- Далее можно загрузить данные из .csv таблиц командами:
- ``` python manage.py load_category_data ```
- ``` python manage.py load_genre_data ```
- ``` python manage.py load_users_data ```
- ``` python manage.py load_title_data ```
- ``` python manage.py load_genre_title_data ```
- ``` python manage.py load_rewiews_data ```
- ``` python manage.py load_comments_data ```
-
-Запустить локальный сервер:
-``` python manage.py runserver ```
-
-
 # Алгоритм регистрации пользователей
 - Пользователь отправляет POST-запрос на добавление нового пользователя с параметрами email и username на эндпоинт /api/v1/auth/signup/.
 - YaMDB отправляет письмо с кодом подтверждения (confirmation_code) на адрес email.
@@ -141,6 +115,33 @@ Python, Django, Django Rest Framework, PyJWT, django-filter.
 - http://127.0.0.7/api/v1/titles/<title_id>/reviews/<review_id>/comments/<comment_id>/
 
 Юзер с правами модератора или админа может редактировать и удалять отзывы других пользователей.
+
+# Как запустить
+На локальном компьютере должен быть установлен Python версии 3 или выше.
+
+- Склонировать данный репозиторий на свой локальный компьютер.
+- Установить виртуальное окружение:
+``` python3 -3.7 -m venv venv ```
+- Обновить менеджер pip и установить зависимости:
+``` py -m pip install --upgrade pip ```
+``` pip install -r requirements.txt. ```
+- Выполнить миграции:
+``` python manage.py migrate ```
+
+- Далее можно загрузить данные из .csv таблиц командами:
+ ``` python manage.py load_category_data ```
+ ``` python manage.py load_genre_data ```
+ ``` python manage.py load_users_data ```
+ ``` python manage.py load_title_data ```
+ ``` python manage.py load_genre_title_data ```
+ ``` python manage.py load_rewiews_data ```
+ ``` python manage.py load_comments_data ```
+
+Запустить локальный сервер:
+``` python manage.py runserver ```
+
+
+Если на вашем ПК установлен Docker, вы можете развернуть этот проект без установки зависимостей на свой ПК. Необхдимая для этого инфраструктура и инструкции находятся в [этом репозитории](https://github.com/yanastasya/infra_sp2/)
 
 # Авторы
 
