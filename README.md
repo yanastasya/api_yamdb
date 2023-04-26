@@ -79,24 +79,24 @@ Python, Django, Django Rest Framework, PyJWT, django-filter.
 
 - Склонировать данный репозиторий на свой локальный компьютер.
 - Установить виртуальное окружение:
-''' python3 -3.7 -m venv venv '''
+``` python3 -3.7 -m venv venv ```
 - Обновить менеджер pip и установить зависимости:
-''' py -m pip install --upgrade pip '''
-''' pip install -r requirements.txt. '''
+``` py -m pip install --upgrade pip ```
+``` pip install -r requirements.txt. ```
 - Выполнить миграции:
-''' python manage.py migrate '''
+``` python manage.py migrate ```
 
 - Далее можно загрузить данные из .csv таблиц командами:
-''' python manage.py load_category_data '''
-''' python manage.py load_genre_data '''
-''' python manage.py load_users_data '''
-''' python manage.py load_title_data '''
-''' python manage.py load_genre_title_data '''
-''' python manage.py load_rewiews_data '''
-''' python manage.py load_comments_data '''
+``` python manage.py load_category_data ```
+``` python manage.py load_genre_data ```
+``` python manage.py load_users_data ```
+``` python manage.py load_title_data ```
+``` python manage.py load_genre_title_data ```
+``` python manage.py load_rewiews_data ```
+``` python manage.py load_comments_data ```
 
 Запустить локальный сервер:
-''' python manage.py runserver '''
+``` python manage.py runserver ```
 
 
 # Алгоритм регистрации пользователей
