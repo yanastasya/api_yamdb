@@ -2,6 +2,7 @@
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/-Django-464646?style=flat-square&logo=Django)](https://www.djangoproject.com/)
 [![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat-square&logo=Django%20REST%20Framework)](https://www.django-rest-framework.org/)
+[![PyJWT](https://img.shields.io/badge/-PyJWT-464646?style=flat-square)](https://pyjwt.readthedocs.io/en/stable/)
 
 # API для базы данных отзывов YamDB.
 Груповой проект в рамках учебного курса Backend Python-разработчик от Яндекс.Практикум.
@@ -69,9 +70,6 @@ API позволяет создавать и регистрировать пол
 ### Получить список всех жанров
 - Создать жанр (только admin)
 - Удалить жанр (только admin)
-
-# Технологии
-Python, Django, Django Rest Framework, PyJWT, django-filter.
 
 # Алгоритм регистрации пользователей
 - Пользователь отправляет POST-запрос на добавление нового пользователя с параметрами email и username на эндпоинт /api/v1/auth/signup/.
